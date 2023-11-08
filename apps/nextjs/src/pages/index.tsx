@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -96,10 +96,11 @@ function CreatePostForm() {
 
 export default function HomePage() {
   const postQuery = api.post.all.useQuery();
-
   const deletePostMutation = api.post.delete.useMutation({
     onSettled: () => postQuery.refetch(),
   });
+  const user = useUser();
+  const convo = api.conversation.all.useQuery(user?.id || "");
 
   return (
     <>

@@ -6,7 +6,6 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 export const postRouter = createTRPCRouter({
   all: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.post.findMany({
-      include: { author: { select: { name: true, image: true } } },
       orderBy: { id: "desc" },
     });
   }),

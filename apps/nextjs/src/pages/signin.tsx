@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Router from "next/router";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Eye, EyeOff, Github } from "lucide-react";
 
@@ -24,7 +25,9 @@ export default function SigninPage() {
     else if (isSignUp && data.user) {
       alert("Check your email for a confirmation link.");
       setIsSignUp(false);
+      return;
     }
+    await Router.push("/");
   };
 
   const signInWithGithub = async () => {
@@ -38,7 +41,9 @@ export default function SigninPage() {
   return (
     <main className="flex h-screen bg-zinc-900 text-zinc-200">
       <div className="mx-auto flex flex-col items-center justify-center gap-6">
-        <h1 className="text-3xl font-extrabold tracking-tight">Sign In</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight">
+          {isSignUp ? "Sign Up" : "Sign In"}
+        </h1>
         <div className="flex w-full flex-col gap-2">
           <input
             className="rounded-lg bg-white/10 px-4 py-1 text-zinc-200 transition hover:bg-white/20"

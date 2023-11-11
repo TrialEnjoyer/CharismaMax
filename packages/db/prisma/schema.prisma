@@ -40,6 +40,7 @@ model Conversation {
   userId    String    @db.Uuid
   user      users     @relation(fields: [userId], references: [id], onDelete: Cascade)
   type      String
+  title     String
   createdAt DateTime  @default(now())
   review    String? // Nullable field
   score     Float? // Nullable field
@@ -50,14 +51,15 @@ model Conversation {
 
 model Message {
   id             Int          @id @default(autoincrement())
-  userId         Int // Assuming 'userId' is a reference to a User model
+  userId         String       @db.Uuid   // id of owner
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   history        String[]
   conversationId Int
   text           String
-  score          Float? // Nullable field
-  review         String? // Nullable field
+  score          Float? // Nullable 
+  review         String? // Nullable 
+  reply          String? // Nullable
   conversation   Conversation @relation(fields: [conversationId], references: [id])
 
   @@schema("public")

@@ -6,7 +6,7 @@ import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 // Conversation tRPC router
 export const conversationRouter = createTRPCRouter({
   // List all conversations
-  all: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+  allForId: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.prisma.conversation.findMany({
       where: { userId, input },
     });

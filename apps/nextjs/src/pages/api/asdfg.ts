@@ -47,11 +47,9 @@ export const GenerateResponse = async (input): Promise<boolean> => {
       },
       { role: "user", content: data.text },
     ], //instructions,
-    max_tokens: 150,
+    max_tokens: 200,
   });
 
-  console.log("Response: ", completion.choices[0]?.message.content);
-  // Check if response is json, and if it is then do nothing but if response is a string, then parse it.
   const response = JSON.parse(completion.choices[0]?.message.content);
 
   //const response = completion.choices[0]?.message.content;//JSON.parse(completion.choices[0]?.message.content);
@@ -61,8 +59,6 @@ export const GenerateResponse = async (input): Promise<boolean> => {
   data.review = response.review;
   data.updatedDate = new Date();
 
-  console.log(data);
-  /*
   const { error } = await supabase
     .from("Message")
     .update(data)
@@ -72,7 +68,7 @@ export const GenerateResponse = async (input): Promise<boolean> => {
     console.log(error);
     return false;
   }
-*/
+
   return true;
 };
 

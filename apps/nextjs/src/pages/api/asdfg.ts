@@ -50,14 +50,14 @@ export const GenerateResponse = async (input): Promise<boolean> => {
     max_tokens: 50,
   });
 
-  console.log("Response: ", completion);
+  console.log("Response: ", completion.choices[0]?.message.content);
   const response = JSON.parse(completion.choices[0]?.message.content);
 
   data.reply = response.reply;
   data.score = response.score;
   data.review = response.review;
   data.updatedDate = new Date();
-
+  /*
   const { error } = await supabase
     .from("Message")
     .update(data)
@@ -67,7 +67,7 @@ export const GenerateResponse = async (input): Promise<boolean> => {
     console.log(error);
     return false;
   }
-
+*/
   return true;
 };
 

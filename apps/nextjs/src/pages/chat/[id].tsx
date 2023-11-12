@@ -140,7 +140,7 @@ const ConversationPage = () => {
       toDatabase["id"] = data[0]?.id;
       setMessages([...messages, toDatabase]);
       //for testing purposes, trigger the response generation
-      handleGenerate(toDatabase);
+      //handleGenerate(toDatabase);
     } catch (error) {
       setError(error.message);
     }

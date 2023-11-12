@@ -57,7 +57,7 @@ export const GenerateResponse = async (input): Promise<boolean> => {
   data.reply = response.reply;
   data.score = response.score;
   data.review = response.review;
-  data.updatedDate = new Date();
+  data.updatedAt = new Date();
 
   const { error } = await supabase
     .from("Message")

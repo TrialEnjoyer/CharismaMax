@@ -51,7 +51,7 @@ export const GenerateResponse = async (input): Promise<boolean> => {
 
   console.log("Response: ", completion);
   //const response = JSON.parse(completion);
-
+  /*
   data.reply = completion.reply;
   data.score = completion.score;
   data.review = completion.review;
@@ -66,7 +66,7 @@ export const GenerateResponse = async (input): Promise<boolean> => {
     console.log(error);
     return false;
   }
-
+*/
   return true;
 };
 

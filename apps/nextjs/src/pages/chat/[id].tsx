@@ -102,6 +102,7 @@ const ConversationPage = () => {
             return message;
           });
           setMessages(updatedMessages);
+          setLoading(false);
           console.log("updated message: ", payload.new);
           return;
         },

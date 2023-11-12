@@ -51,12 +51,17 @@ export const GenerateResponse = async (input): Promise<boolean> => {
   });
 
   console.log("Response: ", completion.choices[0]?.message.content);
+  // Check if response is json, and if it is then do nothing but if response is a string, then parse it.
   const response = JSON.parse(completion.choices[0]?.message.content);
+
+  //const response = completion.choices[0]?.message.content;//JSON.parse(completion.choices[0]?.message.content);
 
   data.reply = response.reply;
   data.score = response.score;
   data.review = response.review;
   data.updatedDate = new Date();
+
+  console.log(data);
   /*
   const { error } = await supabase
     .from("Message")

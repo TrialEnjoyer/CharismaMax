@@ -47,7 +47,7 @@ export const GenerateResponse = async (input): Promise<boolean> => {
       },
       { role: "user", content: data.text },
     ], //instructions,
-    max_tokens: 50,
+    max_tokens: 150,
   });
 
   console.log("Response: ", completion.choices[0]?.message.content);

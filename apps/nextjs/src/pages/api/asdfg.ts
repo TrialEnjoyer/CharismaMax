@@ -53,9 +53,9 @@ export const GenerateResponse = async (input): Promise<boolean> => {
   console.log("Response: ", completion);
   const response = JSON.parse(completion.choices[0]?.message.content);
 
-  data.reply = completion.reply;
-  data.score = completion.score;
-  data.review = completion.review;
+  data.reply = response.reply;
+  data.score = response.score;
+  data.review = response.review;
   data.updatedDate = new Date();
 
   const { error } = await supabase

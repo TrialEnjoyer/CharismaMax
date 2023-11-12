@@ -17,6 +17,8 @@ Response Format:
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 
+import { env } from "~/env.mjs";
+
 const supabase = createClient(
   "https://ptuvhgjossijfhigdnfy.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0dXZoZ2pvc3NpamZoaWdkbmZ5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY5OTIyODkxNywiZXhwIjoyMDE0ODA0OTE3fQ.QiVoU72R3cY14YVk3U5BydNMY8yJxczOgSpFZkTeUGw",
@@ -24,7 +26,7 @@ const supabase = createClient(
 
 export const GenerateResponse = async (input): Promise<boolean> => {
   //console.log(input);
-  const openai = new OpenAI();
+  const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY }); //env.OPENAI_API_KEY);
   const data = input.record;
 
   const completion = await openai.chat.completions.create({

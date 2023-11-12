@@ -23,7 +23,7 @@ const supabase = createClient(
 );
 
 export const GenerateResponse = async (input): Promise<boolean> => {
-  console.log(input);
+  //console.log(input);
   const openai = new OpenAI();
   const data = input.record;
 

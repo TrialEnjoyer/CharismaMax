@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import Router from "next/router";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import OpenAI from "openai";
+
+//import { env } from "~/env.mjs";
 
 type Conversation = {
   createdAt: string;
@@ -123,7 +126,10 @@ const ConversationPage = () => {
         userId: user.id,
         updatedAt: new Date(),
       };
-      const { error } = await supabase.from("Message").insert(toDatabase);
+      const { data, error } = await supabase
+        .from("Message")
+        .insert(toDatabase)
+        .select("id");
 
       if (error) {
         console.log(error);
@@ -131,13 +137,46 @@ const ConversationPage = () => {
       }
       setNewMessage("");
       setError("");
-      toDatabase["id"] = messages.length + 42;
+      toDatabase["id"] = data[0]?.id;
       setMessages([...messages, toDatabase]);
+      //for testing purposes, trigger the response generation
+      handleGenerate(toDatabase);
     } catch (error) {
       setError(error.message);
     }
     setLoading(false);
   };
+
+  /*const handleGenerate = async (input) => {
+    const openai = new OpenAI({
+      apiKey: "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",
+      dangerouslyAllowBrowser: true,
+    }); //env.OPENAI_API_KEY);
+    const data = input;
+    console.log(data);
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo", // Specify the model
+      messages: [
+        {
+          role: "system",
+          content: `Rate the following messages from the user on a scale of 0 to 100 based on its clarity, politeness, effectiveness, and overall communication quality. Provide a short review on how the message could have been better, considering factors such as tone, clarity, and engagement. Then, craft an appropriate response to the message. Format your reply as a JSON object containing the score, review, and response.
+      Response Format: 
+      {
+        "score": [Your score out of 100],
+        "review": "[Your review here]",
+        "reply": "[Your response to the message here]"
+      }
+      Always stick to the Response format. Do not mention anything about being an ai model. Always reply as realistically as possible keeping the whole conversation in mind. `,
+        },
+        { role: "user", content: data.text },
+      ], //instructions,
+      max_tokens: 50,
+      response_format: { type: "json_object" },
+    });
+
+    console.log("Response: ", completion);
+  };*/
 
   useEffect(() => {
     const length = messages.length;
@@ -196,13 +235,13 @@ const ConversationPage = () => {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message here"
-            disabled={loading}
+            disabled={false} //loading}
             className="flex min-h-[64px] flex-grow rounded border p-2 text-black"
             maxLength={500}
           />
           <button
             onClick={handleSend}
-            disabled={loading}
+            disabled={false} //loading}
             className=" max-h-[64px] rounded bg-blue-500 px-4 py-2 text-white disabled:bg-blue-300"
           >
             Send

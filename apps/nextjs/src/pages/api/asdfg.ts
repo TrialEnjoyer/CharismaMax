@@ -50,7 +50,7 @@ export const GenerateResponse = async (input): Promise<boolean> => {
     max_tokens: 50,
   });
 
-  console.log("Response: ", completion);
+  console.log("Response: ", completion.choices[0]?.message);
   //const response = JSON.parse(completion);
   /*
   data.reply = completion.reply;

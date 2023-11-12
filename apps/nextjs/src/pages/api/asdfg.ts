@@ -59,15 +59,7 @@ export const GenerateResponse = async (input): Promise<boolean> => {
   data.review = response.review;
   data.updatedAt = new Date();
 
-  const { error } = await supabase
-    .from("Message")
-    .update(data)
-    .eq("id", data.id);
-
-  if (error) {
-    console.log(error);
-    return false;
-  }
+  supabase.from("Message").update(data).eq("id", data.id);
 
   return true;
 };

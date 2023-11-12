@@ -50,9 +50,9 @@ export const GenerateResponse = async (input): Promise<boolean> => {
     max_tokens: 50,
   });
 
-  console.log("Response: ", completion.choices[0]?.message);
-  //const response = JSON.parse(completion);
-  /*
+  console.log("Response: ", completion);
+  const response = JSON.parse(completion.choices[0]?.message.content);
+
   data.reply = completion.reply;
   data.score = completion.score;
   data.review = completion.review;
@@ -67,7 +67,7 @@ export const GenerateResponse = async (input): Promise<boolean> => {
     console.log(error);
     return false;
   }
-*/
+
   return true;
 };
 

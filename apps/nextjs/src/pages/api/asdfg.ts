@@ -24,8 +24,10 @@ const supabase = createClient(
 
 export const GenerateResponse = async (input): Promise<boolean> => {
   //console.log(input);
+  console.log("Attempting the thing.");
   const openai = new OpenAI({
     apiKey: "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",
+    dangerouslyAllowBrowser: true,
   }); //env.OPENAI_API_KEY);
   const data = input.record;
 

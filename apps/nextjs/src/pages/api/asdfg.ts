@@ -48,7 +48,6 @@ export const GenerateResponse = async (input): Promise<boolean> => {
       { role: "user", content: data.text },
     ], //instructions,
     max_tokens: 50,
-    response_format: { type: "json_object" },
   });
 
   console.log("Response: ", completion);

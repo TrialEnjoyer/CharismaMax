@@ -235,13 +235,13 @@ const ConversationPage = () => {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type your message here"
-            disabled={false} //loading}
+            disabled={loading}
             className="flex min-h-[64px] flex-grow rounded border p-2 text-black"
             maxLength={500}
           />
           <button
             onClick={handleSend}
-            disabled={false} //loading}
+            disabled={loading}
             className=" max-h-[64px] rounded bg-blue-500 px-4 py-2 text-white disabled:bg-blue-300"
           >
             Send

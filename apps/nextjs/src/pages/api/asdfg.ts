@@ -1,3 +1,19 @@
+/*const instructions = `
+Rate the following messages from the user on a scale of 0 to 100 based on its clarity, politeness, effectiveness, and overall communication quality. Provide a short review on how the message could have been better, considering factors such as tone, clarity, and engagement. Then, craft an appropriate response to the message. Format your reply as a JSON object containing the score, review, and response.
+
+Message: "${data.text}"
+
+---
+
+Response Format: 
+{
+  "score": [Your score out of 100],
+  "review": "[Your review here]",
+  "reply": "[Your response to the message here]"
+}
+ Always stick to the Response format. Do not mention anything about being an ai model - always reply as realistically as possible keeping the whole conversation in mind. 
+`;*/
+
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 
@@ -7,25 +23,9 @@ const supabase = createClient(
 );
 
 export const GenerateResponse = async (input): Promise<boolean> => {
+  console.log(input);
   const openai = new OpenAI();
   const data = input.record;
-  console.log(input);
-  /*const instructions = `
-  Rate the following messages from the user on a scale of 0 to 100 based on its clarity, politeness, effectiveness, and overall communication quality. Provide a short review on how the message could have been better, considering factors such as tone, clarity, and engagement. Then, craft an appropriate response to the message. Format your reply as a JSON object containing the score, review, and response.
-  
-  Message: "${data.text}"
-  
-  ---
-  
-  Response Format: 
-  {
-    "score": [Your score out of 100],
-    "review": "[Your review here]",
-    "reply": "[Your response to the message here]"
-  }
-
-  Always stick to the Response format. Do not mention anything about being an ai model - always reply as realistically as possible keeping the whole conversation in mind. 
-`;*/
 
   const completion = await openai.chat.completions.create({
     model: "gpt-3.5-turbo", // Specify the model
@@ -48,11 +48,11 @@ export const GenerateResponse = async (input): Promise<boolean> => {
   });
 
   console.log("Response: ", completion);
-  const response = JSON.parse(completion);
+  //const response = JSON.parse(completion);
 
-  data.reply = response.reply;
-  data.score = response.score;
-  data.review = response.review;
+  data.reply = completion.reply;
+  data.score = completion.score;
+  data.review = completion.review;
   data.updatedDate = new Date();
 
   const { error } = await supabase

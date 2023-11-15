@@ -77,7 +77,7 @@ export default function SigninPage() {
             {isSignUp ? "Already have an account?" : "Don't have an account?"}
           </button>
         </div>
-
+        {/*
         <div className="relative flex w-full justify-center border-b border-zinc-200 py-2">
           <span className="absolute top-1 bg-zinc-900 px-2">or</span>
         </div>
@@ -88,7 +88,7 @@ export default function SigninPage() {
         >
           <Github size={20} />
           Continue with Github
-        </button>
+  </button>*/}
       </div>
     </main>
   );

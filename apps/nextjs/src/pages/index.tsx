@@ -163,7 +163,7 @@ export default function HomePage() {
     <>
       <Head>
         <title>END ME.</title>
-        <meta name="description" content="T3 Turbo x Supabase" />
+        <meta name="description" content="CharismaMax" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col bg-zinc-900 text-zinc-200">
@@ -171,7 +171,7 @@ export default function HomePage() {
           <div className="container mt-12 flex flex-col items-center justify-center gap-4 px-4 py-8">
             <h1 className="my-20 text-center text-5xl font-extrabold tracking-tight sm:text-[5rem]">
               <span className="text-fuchsia-500">END</span> me{" "}
-              <span className="text-emerald-400">(Please)</span>
+              <span className="text-emerald-400">(Placeholder)</span>
             </h1>
             <AuthShowcase />
             <CreateConvoForm />

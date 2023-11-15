@@ -13,7 +13,7 @@ Response Format:
 }
  Always stick to the Response format. Do not mention anything about being an ai model - always reply as realistically as possible keeping the whole conversation in mind. 
 `;*/
-
+/*
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
 
@@ -23,7 +23,6 @@ const supabase = createClient(
 );
 
 export const GenerateResponse = async (input): Promise<boolean> => {
-  //console.log(input);
   console.log("Attempting the thing.");
   const openai = new OpenAI({
     apiKey: "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",
@@ -88,3 +87,4 @@ export default async function handler(req, res) {
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
+*/

@@ -99,6 +99,10 @@ const ConversationPage = () => {
     //perform user check, if user - then fetch Conversation
     const id = window.location.pathname.replace("/chat/", "");
     const convoId = parseInt(id);
+
+    //Place conversationId here in production.
+    conversationId.current = convoId;
+
     if (conversationId.current != null) {
       console.log(conversationId.current);
       fetchConversation(convoId).catch(() => {
@@ -108,8 +112,9 @@ const ConversationPage = () => {
         console.log("error fetching messages");
       });
     }
-    //set conversationId AFTER fetching conversation IF statement to guarantee it only happens once
-    conversationId.current = convoId;
+    //place conversationId here in development
+    //conversationId.current = convoId;
+
     /* May not actually need realtime updates.
     //setup subscription to messages
 

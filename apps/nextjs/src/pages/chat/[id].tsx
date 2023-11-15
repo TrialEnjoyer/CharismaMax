@@ -64,6 +64,7 @@ const ConversationPage = () => {
   // Function to fetch messages
   const fetchMessages = async (id: number): Promise<void> => {
     try {
+      console.log("fetching messages");
       const { data, error } = await supabase
         .from("Message")
         .select("*")
@@ -73,6 +74,7 @@ const ConversationPage = () => {
         console.log(error);
         throw error;
       }
+      console.log(data);
       setMessages(data);
       //if messages contains just 1 message and no reply, then generate a response.
       if (data.length == 1 && !data[0].reply) {

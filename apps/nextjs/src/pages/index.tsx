@@ -557,7 +557,7 @@ export default function HomePage() {
                 <h3 className="bg-emerald-600 text-center text-xl font-semibold text-black">
                   Conversations
                 </h3>
-                <div className="overflow-scroll">
+                <div className="overflow-scroll overflow-x-hidden">
                   {conversation.map((c) => {
                     return (
                       <div

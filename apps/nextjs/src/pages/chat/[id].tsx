@@ -56,13 +56,7 @@ const ConversationPage = () => {
       setMessages(data);
       //if messages contains just 1 message and no reply, then generate a response.
       if (data.length == 1 && !data[0].reply) {
-        const ToHandleMessage: message = {
-          ...data[0],
-          text:
-            data[0].text +
-            " (From the admin - DO NOT INCLUDE IN SCORING) - Advance the conversation in a random direction based on your character and the scenario.",
-        };
-        handleGenerate(ToHandleMessage);
+        handleGenerate(data[0], true);
         //console.log("asdfasdf");
         return;
       }
@@ -164,7 +158,7 @@ const ConversationPage = () => {
     return transformedMessages;
   }
 
-  const handleGenerate = async (input: message) => {
+  const handleGenerate = async (input: message, first: boolean) => {
     setLoading(true);
     setShowRegenerate(false);
     const openai = new OpenAI({
@@ -173,9 +167,12 @@ const ConversationPage = () => {
     });
     const ResponseAddOnText = `Stay in character while replying. Response is to always be in valid JSON format following: {"reply": "[Your response to the message here]","score": [Your score out of 100],"review": "[Your review here]"}`;
     const openAIFormattedMessages = transformMessagesToOpenAIFormat(messages);
-
+    let inputmessage = input.text;
+    if (first) {
+      inputmessage += `(From the admin - DO NOT INCLUDE IN SCORING - Advance the conversation in a direction based on your the scenario)`;
+    }
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // Specify the model
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
@@ -184,7 +181,7 @@ const ConversationPage = () => {
             Always stick to the Response format. Do not ask how you can assist the user nor mention anything about being an ai model or assistant. ${ResponseAddOnText}. Once again, the character you play does not offer assistance or uses standard greetings like 'How can I help you?' and if you do not know what to say, or if the input is too small to generate a decent response, then reply true to your character in that situation.`,
         },
         ...openAIFormattedMessages,
-        { role: "user", content: input.text + " --- " + ResponseAddOnText },
+        { role: "user", content: inputmessage + " --- " + ResponseAddOnText },
       ],
       max_tokens: 150,
       stream: true,
@@ -285,7 +282,7 @@ const ConversationPage = () => {
         </div>
         <h1 className="text-2xl font-bold">{conversation?.title}</h1>
       </div>
-      <div className=" flex-grow overflow-scroll p-5" ref={messagesRef}>
+      <div className=" flex-grow overflow-x-hidden p-5" ref={messagesRef}>
         {messages.map((message) => {
           return (
             <div key={message.id} className="">

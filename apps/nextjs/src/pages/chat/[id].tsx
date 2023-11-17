@@ -4,29 +4,7 @@ import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import OpenAI from "openai";
 
 import { env } from "~/env.mjs";
-
-type Conversation = {
-  createdAt: string;
-  id: number;
-  review?: string | null;
-  score?: number | null;
-  type: string;
-  userId: string;
-  title: string;
-};
-
-type message = {
-  id: number;
-  conversationId: number;
-  text: string;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  score?: number;
-  review?: string;
-  reply?: string;
-  history: string[];
-};
+import type { Conversation, message } from "~/types";
 
 const ConversationPage = () => {
   const [conversation, setConversation] = useState<Conversation>();
@@ -78,7 +56,13 @@ const ConversationPage = () => {
       setMessages(data);
       //if messages contains just 1 message and no reply, then generate a response.
       if (data.length == 1 && !data[0].reply) {
-        handleGenerate(data[0]);
+        const ToHandleMessage: message = {
+          ...data[0],
+          text:
+            data[0].text +
+            " (From the admin - DO NOT INCLUDE IN SCORING) - Advance the conversation in a random direction based on your character and the scenario.",
+        };
+        handleGenerate(ToHandleMessage);
         //console.log("asdfasdf");
         return;
       }
@@ -112,23 +96,6 @@ const ConversationPage = () => {
         console.log("error fetching messages");
       });
     }
-    //place conversationId here in development
-    //conversationId.current = convoId;
-
-    /* May not actually need realtime updates.
-    //setup subscription to messages
-
-    const MessageSubscription = supabase
-      .channel(`ChatMessages:${convoId}`)
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "Message" },
-        manipulateMessagesWithUpdate,
-      )
-      .subscribe();
-    return () => {
-      MessageSubscription.unsubscribe();
-    };*/
   }, []);
 
   const handleSend = async () => {
@@ -204,17 +171,17 @@ const ConversationPage = () => {
       apiKey: env.NEXT_PUBLIC_OPENAI_API_KEY,
       dangerouslyAllowBrowser: true,
     });
-    const ResponseAddOnText = ` Response is to always be in valid JSON format following: {"reply": "[Your response to the message here]","score": [Your score out of 100],"review": "[Your review here]"}`;
+    const ResponseAddOnText = `Stay in character while replying. Response is to always be in valid JSON format following: {"reply": "[Your response to the message here]","score": [Your score out of 100],"review": "[Your review here]"}`;
     const openAIFormattedMessages = transformMessagesToOpenAIFormat(messages);
+
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo", // Specify the model
       messages: [
         {
           role: "system",
-          content:
-            `Rate the following messages from the user on a scale of 0 to 100 based on its clarity, politeness, effectiveness, and overall communication quality. Provide a short review on how the message could have been better, considering factors such as tone, clarity, and engagement. Then, craft an appropriate response to the message. Format your reply as a JSON object containing the score, review, and response.
-      Always stick to the Response format. Do not mention anything about being an ai model or assistant; You are a conversation partner, a ficticious character of your own making. Do not ask how you can assist the user. Always reply as realistically as possible keeping the whole conversation in mind. If the reply doesnt go somewhere, try to steer the conversation in a random direction in an attempt to keep it going. If after a few replies the conversation still doesnt go anywhere, feel free to end the conversation. Also feel free to get confrontational if the user is being rude or abusive.` +
-            ResponseAddOnText,
+          content: ` You are a modern conversation partner, a ficticious modern character called ${conversation?.character_id}, your background is as follows: ${conversation?.character_text}. The current scenario is: ${conversation?.scenario_text}. Always reply in character as much possible keeping the whole conversation in mind. If the reply doesnt go somewhere, try to steer the conversation in a random direction in an attempt to keep it going. If after a few replies the conversation still doesnt go anywhere, feel free to end the conversation.
+            Rate the following messages from the user on a scale of 0 to 100 based on the following scoring difficulty: ${conversation?.difficulty_text},taking into consideration the character you play, the user's reply, and the scenario. Provide a short review on how the message could have been better, considering factors such as tone, clarity, and engagement. Then, craft an appropriate response to the message. Format your reply as a JSON object containing the score, review, and response.
+            Always stick to the Response format. Do not ask how you can assist the user nor mention anything about being an ai model or assistant. ${ResponseAddOnText}. Once again, the character you play does not offer assistance or uses standard greetings like 'How can I help you?' and if you do not know what to say, or if the input is too small to generate a decent response, then reply true to your character in that situation.`,
         },
         ...openAIFormattedMessages,
         { role: "user", content: input.text + " --- " + ResponseAddOnText },
@@ -222,6 +189,7 @@ const ConversationPage = () => {
       max_tokens: 150,
       stream: true,
     });
+
     let streamTxt = "";
     for await (const message of completion) {
       if (

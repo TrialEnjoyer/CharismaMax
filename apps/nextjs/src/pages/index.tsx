@@ -222,18 +222,37 @@ function CreateConvoForm() {
   const [content, setContent] = useState<string>("");
 
   const createConversation = async () => {
+    //Check for randoms and add when required
+    let selScen = selectedScenario;
+    if (!selectedScenario) {
+      const randomScenario =
+        scenarios[Math.floor(Math.random() * scenarios.length)];
+      selScen = randomScenario;
+    }
+    let selDif = selectedDifficulty;
+    if (!selectedDifficulty) {
+      const randomDifficulty =
+        difficulties[Math.floor(Math.random() * difficulties.length)];
+      selDif = randomDifficulty;
+    }
+    let selChar = selectedCharacter;
+    if (!selectedCharacter) {
+      const randomCharacter =
+        characters[Math.floor(Math.random() * characters.length)];
+      selChar = randomCharacter;
+    }
+
     const toConversation: Conversation = {
       type: "basic",
       userId: user.id,
-      title:
-        selectedScenario?.name + " with " + selectedCharacter?.id || "untitled", //title: content.length > 20 ? content.slice(0, 20) + "..." : content,
-      scenario_name: selectedScenario?.name,
-      scenario_id: selectedScenario?.id.toString(),
-      scenario_text: selectedScenario?.text,
-      difficulty_name: selectedDifficulty?.name,
-      difficulty_text: selectedDifficulty?.text,
-      character_id: selectedCharacter?.id,
-      character_text: selectedCharacter?.backstory,
+      title: selScen?.name + " with " + selChar?.id || "untitled",
+      scenario_name: selScen?.name,
+      scenario_id: selScen?.id.toString(),
+      scenario_text: selScen?.text,
+      difficulty_name: selDif?.name,
+      difficulty_text: selDif?.text,
+      character_id: selChar?.id,
+      character_text: selChar?.backstory,
     };
     const { data, error } = await supabase
       .from("Conversation")
@@ -268,7 +287,7 @@ function CreateConvoForm() {
     return;
   };
 
-  const DataChecks = () => {
+  const DataChecks = async () => {
     setLoading(true);
     if (!user) {
       setError("Please sign in to start a conversation.");
@@ -280,26 +299,7 @@ function CreateConvoForm() {
       setLoading(false);
       return;
     }
-    //Check for data, if data not present, randomize from lists.
-    if (!selectedScenario) {
-      const randomScenario =
-        scenarios[Math.floor(Math.random() * scenarios.length)];
-      setSelectedScenario(randomScenario);
-    }
-    if (!selectedDifficulty) {
-      const randomDifficulty =
-        difficulties[Math.floor(Math.random() * difficulties.length)];
-      setSelectedDifficulty(randomDifficulty);
-    }
-    if (!selectedCharacter) {
-      const randomCharacter =
-        characters[Math.floor(Math.random() * characters.length)];
-      setSelectedCharacter(randomCharacter);
-    }
     setTimeout(() => {
-      console.log(selectedScenario);
-      console.log(selectedDifficulty);
-      console.log(selectedCharacter);
       handleSend();
     }, 200);
   };
@@ -327,11 +327,12 @@ function CreateConvoForm() {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex flex-col items-center justify-center">
+    <div className="container mx-auto p-6">
+      <div className="flex max-w-2xl flex-col items-center justify-center">
         {/* Form Heading */}
-        <h2 className="mb-4 text-2xl font-bold">Start a New Conversation</h2>
-
+        <h2 className="mb-4 text-center text-2xl font-bold">
+          Start a New Conversation
+        </h2>
         {/* Error Message */}
         {error && (
           <div
@@ -341,7 +342,6 @@ function CreateConvoForm() {
             {error}
           </div>
         )}
-
         {/* Scenario Selector */}
         <div className="mb-4 flex w-60 flex-col justify-center">
           <label
@@ -406,7 +406,7 @@ function CreateConvoForm() {
             {characters.map((character) => (
               <div
                 key={character.id}
-                className={`relative h-24 w-24 cursor-pointer rounded-lg bg-cover bg-center ${
+                className={`relative h-24 w-24 cursor-pointer rounded-lg bg-cover bg-center hover:scale-105 ${
                   selectedCharacter?.id === character.id
                     ? "ring-2 ring-blue-500"
                     : ""
@@ -456,44 +456,6 @@ function CreateConvoForm() {
     </div>
   );
 }
-/*
-  return (
-    <div className="flex w-full max-w-2xl flex-col p-4">
-      <textarea
-        disabled={loading}
-        className=" mb-2 min-h-[64px] rounded bg-white/10 p-2 text-zinc-200"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        placeholder="Type here to start a conversation"
-      />
-      <button
-        className="rounded bg-emerald-400 p-2 font-bold text-zinc-900"
-        disabled={loading}
-        onClick={handleSend}
-      >
-        Create Conversation!
-      </button>
-      {error.length > 0 && (
-        <span className="mt-2 text-red-500">
-          <p>{error}</p>
-        </span>
-      )}
-    </div>
-  );
-}
-*/
-type message = {
-  id: number;
-  conversationId: number;
-  text: string;
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  score?: number;
-  review?: string;
-  reply?: string;
-  history: string[];
-};
 
 export default function HomePage() {
   const user = useUser();
@@ -530,7 +492,7 @@ export default function HomePage() {
     }
   };
 
-  const handleOutsideClick = (event) => {
+  const handleOutsideClick = () => {
     setOpen(false);
   };
 
@@ -542,41 +504,48 @@ export default function HomePage() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col bg-zinc-900 text-zinc-200">
-        <div className=" flex flex-row-reverse">
-          <div className="container mt-12 flex flex-col items-center justify-center gap-4 px-4 py-8">
-            <h1 className="my-20 text-center text-5xl font-extrabold tracking-tight text-lime-600 sm:text-[5rem]">
-              Charisma<span className=" text-rose-700">Max</span>
-            </h1>
-            <AuthShowcase />
-            <CreateConvoForm />
-          </div>
+        <div className=" flex">
+          {" "}
           {/** Old conversations list */}
           {open ? (
-            <div className="absolute inset-0 flex w-screen md:relative md:w-auto">
-              <div className="absolute left-0 z-10 max-h-screen w-[80%] overflow-auto bg-zinc-900 p-5 md:relative md:max-w-md">
+            <div className="absolute inset-0 flex w-screen self-start md:relative md:w-auto">
+              <div className="absolute left-0 z-10 max-h-screen w-4/5 justify-between overflow-auto bg-zinc-900 md:relative md:max-w-md">
                 <h3
-                  onClick={() => {
-                    setOpen(false);
-                  }}
-                  className="mb-4 bg-emerald-600 text-center text-xl font-semibold text-black"
+                  onClick={() => setOpen(false)}
+                  className=" sticky top-0 cursor-pointer bg-lime-600 py-3 text-center text-xl font-semibold text-black"
                 >
-                  Conversations
+                  Close Menu
                 </h3>
-                <div className="space-y-4">
-                  {conversation.map((c) => (
-                    <div
-                      key={c.id}
-                      className="flex flex-col items-center justify-center gap-2 rounded-lg bg-white/10 p-4 transition duration-300 ease-in-out hover:bg-white/20"
-                    >
-                      <Link href={`/chat/${c.id}`}>
-                        <span className="text-xl font-bold">{c.title}</span>
-                      </Link>
-                      <p className="text-sm text-zinc-400">
-                        {new Date(c.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))}
+                <div>
+                  <h3 className=" my-4 w-full bg-zinc-900 text-center text-xl font-semibold">
+                    Your Conversations
+                  </h3>
+                  <div className="mb-4 space-y-4 px-5">
+                    {conversation.map((c) => (
+                      <div
+                        key={c.id}
+                        className="flex flex-col items-center justify-center gap-2 rounded-lg bg-white/10 p-4 transition duration-300 ease-in-out hover:bg-white/20"
+                      >
+                        <Link href={`/chat/${c.id}`}>
+                          <span className="text-xl font-bold">{c.title}</span>
+                        </Link>
+                        <p className="text-sm text-zinc-400">
+                          {new Date(c.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
+                <button
+                  className="sticky bottom-0 w-full bg-red-700 px-10 py-3 text-xl font-semibold text-zinc-200 no-underline transition"
+                  onClick={() => {
+                    supabase.auth.signOut();
+                    setOpen(false);
+                    Router.push("/");
+                  }}
+                >
+                  Sign Out
+                </button>
               </div>
               <div
                 className="flex h-screen w-full bg-zinc-900 bg-opacity-80 md:hidden"
@@ -587,50 +556,21 @@ export default function HomePage() {
             <div className="absolute left-5 top-5">
               <button
                 className="rounded-lg bg-white/10 px-5 py-2 font-semibold text-zinc-200 transition hover:bg-white/20"
-                onClick={() => setOpen(true)}
+                onClick={() => (user ? setOpen(true) : Router.push("/signin"))}
               >
-                Open Menu
+                {user ? "Open Menu" : "Sign In"}
               </button>
             </div>
           )}
+          <div className="mx-auto flex flex-col items-center justify-center gap-4 px-4 py-8">
+            <h1 className="my-10 text-center text-5xl font-extrabold tracking-tight text-lime-600 sm:text-[5rem]">
+              Charisma<span className=" text-red-700">Max</span>
+            </h1>
+            {/**<AuthShowcase />*/}
+            <CreateConvoForm />
+          </div>
         </div>
       </main>
     </>
-  );
-}
-
-function AuthShowcase() {
-  const supabase = useSupabaseClient();
-  const user = useUser();
-  /*const { data: secretMessage } = api.auth.getSecretMessage.useQuery(
-    undefined, // no input
-    { enabled: !!user },
-  );*/
-
-  return (
-    <div className="absolute right-5 top-5 flex flex-col items-center justify-center gap-4">
-      {!user && (
-        <Link
-          className="flex items-center gap-1 rounded-lg bg-white/10 px-10 py-3 font-semibold text-zinc-200 no-underline transition hover:bg-white/20"
-          href="/signin"
-        >
-          Sign In
-        </Link>
-      )}
-      {user && (
-        <>
-          {/*<p className="text-center text-2xl text-zinc-200">
-            {user && <span>Logged in as {user?.user_metadata?.name}</span>}
-            {secretMessage && <span> - {secretMessage}</span>}
-          </p>*/}
-          <button
-            className="rounded-lg bg-white/10 px-10 py-3 font-semibold text-zinc-200 no-underline transition hover:bg-white/20"
-            onClick={() => void supabase.auth.signOut()}
-          >
-            Sign Out
-          </button>
-        </>
-      )}
-    </div>
   );
 }

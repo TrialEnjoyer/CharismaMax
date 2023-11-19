@@ -552,41 +552,44 @@ export default function HomePage() {
           </div>
           {/** Old conversations list */}
           {open ? (
-            <div className=" absolute flex w-screen md:static md:w-auto">
-              <div className=" absolute left-0 flex max-h-screen max-w-full flex-col self-start bg-zinc-900 px-5 pt-5 md:static">
-                <h3 className="bg-emerald-600 text-center text-xl font-semibold text-black">
+            <div className="absolute inset-0 flex w-screen md:relative md:w-auto">
+              <div className="absolute left-0 z-10 max-h-screen w-[80%] overflow-auto bg-zinc-900 p-5 md:relative md:max-w-md">
+                <h3
+                  onClick={() => {
+                    setOpen(false);
+                  }}
+                  className="mb-4 bg-emerald-600 text-center text-xl font-semibold text-black"
+                >
                   Conversations
                 </h3>
-                <div className="overflow-scroll overflow-x-hidden">
-                  {conversation.map((c) => {
-                    return (
-                      <div
-                        key={c.id}
-                        className="my-3 flex max-w-2xl flex-col items-center justify-center gap-4 rounded-lg bg-white/10 p-4"
-                      >
-                        <Link href={`/chat/${c.id}`}>
-                          <span className="text-xl font-bold">{c.title}</span>
-                        </Link>
-                        <p className="text-sm text-zinc-400">
-                          {new Date(c.createdAt).toLocaleDateString()}
-                        </p>
-                      </div>
-                    );
-                  })}
+                <div className="space-y-4">
+                  {conversation.map((c) => (
+                    <div
+                      key={c.id}
+                      className="flex flex-col items-center justify-center gap-2 rounded-lg bg-white/10 p-4 transition duration-300 ease-in-out hover:bg-white/20"
+                    >
+                      <Link href={`/chat/${c.id}`}>
+                        <span className="text-xl font-bold">{c.title}</span>
+                      </Link>
+                      <p className="text-sm text-zinc-400">
+                        {new Date(c.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
               <div
-                className=" flex h-screen flex-grow bg-zinc-900 bg-opacity-80"
+                className="flex h-screen w-full bg-zinc-900 bg-opacity-80 md:hidden"
                 onClick={handleOutsideClick}
               ></div>
             </div>
           ) : (
             <div className="absolute left-5 top-5">
               <button
-                className="rounded-lg bg-white/10 px-5 py-2 font-semibold text-zinc-200 no-underline transition hover:bg-white/20"
+                className="rounded-lg bg-white/10 px-5 py-2 font-semibold text-zinc-200 transition hover:bg-white/20"
                 onClick={() => setOpen(true)}
               >
-                V
+                Open Menu
               </button>
             </div>
           )}

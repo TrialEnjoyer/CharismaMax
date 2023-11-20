@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Router, { useRouter } from "next/router";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import OpenAI from "openai";
 
 import { env } from "~/env.mjs";
 import type { Conversation, message } from "~/types";
+import ThinkingSVG from "../../../public/Assets/think-50s-200px.svg";
 
 const ConversationPage = () => {
   const [conversation, setConversation] = useState<Conversation>();
@@ -19,6 +21,7 @@ const ConversationPage = () => {
   const [loading, setLoading] = useState(false);
   const [showRegenerate, setShowRegenerate] = useState(false);
   const [stream, setStream] = useState<string>("");
+  const [loadingMessageId, setLoadingMessageId] = useState<number | null>(null);
 
   // Function to fetch conversation details
   const fetchConversation = async (id: number): Promise<void> => {
@@ -161,6 +164,7 @@ const ConversationPage = () => {
   const handleGenerate = async (input: message, first: boolean) => {
     setLoading(true);
     setShowRegenerate(false);
+    setLoadingMessageId(input.id);
     const openai = new OpenAI({
       apiKey: env.NEXT_PUBLIC_OPENAI_API_KEY,
       dangerouslyAllowBrowser: true,
@@ -223,6 +227,7 @@ const ConversationPage = () => {
       };
       setStream("");
       setLoading(false);
+      setLoadingMessageId(null);
       const { error } = await supabase
         .from("Message")
         .update(toDatabase)
@@ -244,7 +249,7 @@ const ConversationPage = () => {
     if (loading) {
       setTimeout(() => {
         if (!stream && loading) {
-          setError("Taking a while... Regeneration active");
+          //setError("Taking a while... Regeneration active");
           setShowRegenerate(true);
         }
       }, 10000);
@@ -282,59 +287,67 @@ const ConversationPage = () => {
         </div>
         <h1 className="text-2xl font-bold">{conversation?.title}</h1>
       </div>
-      <div className=" flex-grow overflow-x-hidden p-5" ref={messagesRef}>
-        {messages.map((message) => {
-          return (
-            <div key={message.id} className="">
-              <div className="my-5">
-                <p className="p-5 text-zinc-400">{message.text}</p>
-              </div>
-              <div className=" bg-zinc-800 p-5">
-                {message.reply ? (
-                  <Card
-                    reply={message.reply}
-                    review={message.review}
-                    score={message.score}
-                  />
-                ) : (
-                  <div className="flex justify-center">
-                    <span className=" text-center text-zinc-500">
-                      {stream.length > 0 && stream}
-                    </span>
-                    {/** loading spinner */}
-                    {stream.length == 0 && (
-                      <>
-                        {showRegenerate ? (
-                          <button
-                            onClick={() => {
-                              setError("");
-                              handleGenerate(message);
-                            }}
-                            className="rounded bg-blue-500 px-2 py-1 text-white"
-                          >
-                            Regenerate
-                          </button>
-                        ) : (
-                          <div className="relative my-10 h-16 w-16">
-                            <div className="absolute left-0 top-0 h-full w-full animate-spin rounded-full border-4 border-t-0 border-blue-500" />
-                            <div
-                              className="absolute left-0 top-0 h-full w-full animate-spin rounded-full border-4 border-t-0 border-red-500"
-                              style={{ animationDelay: "-0.5s" }}
-                            />
-                            <div
-                              className="absolute left-0 top-0 h-full w-full animate-spin rounded-full border-4 border-t-0 border-green-500"
-                              style={{ animationDelay: "-1s" }}
-                            />
-                          </div>
+      <div className=" flex-grow overflow-x-hidden md:p-5" ref={messagesRef}>
+        {messages
+          .sort((a, b) => a.id - b.id)
+          .map((message) => {
+            return (
+              <div key={message.id} className="">
+                <div className="my-5">
+                  <p className="p-5 text-zinc-400">{message.text}</p>
+                </div>
+                <div className=" flex flex-row justify-between bg-zinc-800 p-1 md:p-5">
+                  {message.reply ? (
+                    <Card
+                      reply={message.reply}
+                      review={message.review}
+                      score={message.score}
+                    />
+                  ) : (
+                    <div className="flex flex-grow justify-center ">
+                      <span className=" w-full text-left text-zinc-400">
+                        {stream.length > 0 && stream}
+                      </span>
+                      {stream.length == 0 && loading && showRegenerate && (
+                        <button
+                          onClick={() => {
+                            setError("");
+                            handleGenerate(message);
+                          }}
+                          className="mx-auto h-10 self-center rounded bg-blue-500 px-2 py-1 text-white"
+                        >
+                          Retry
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  <div className="relative">
+                    <div className="flex w-24">
+                      {loading &&
+                        stream.length == 0 &&
+                        loadingMessageId == message.id && (
+                          <Image
+                            src={ThinkingSVG}
+                            alt="Thinking"
+                            width={80} // Set this to the width of your SVG
+                            height={80} // Set this to the height of your SVG
+                            className="absolute z-10 h-20 w-20" // z-10 to ensure it's above the other image
+                            style={{ top: -35, left: -25 }} // Adjust top and left values to position it correctly over the portrait
+                          />
                         )}
-                      </>
-                    )}
+                      <Image
+                        src={`/Assets/Characters/${conversation?.character_id}.png`}
+                        alt="Character Portrait"
+                        width={96}
+                        height={96}
+                        className="z-0 h-24 w-24 rounded-full object-cover" // z-0 or remove if not needed, to ensure this is below the ThinkingSVG
+                      />
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
       <div className=" w-full justify-end">
         <div className="mb-5 flex flex-row gap-3 self-end">

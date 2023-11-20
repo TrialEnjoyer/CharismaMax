@@ -1,10 +1,28 @@
-# T3 Turbo x Supabase
+# CharismaMax
 
-![CleanShot 2023-04-11 at 23 42 53@2x](https://user-images.githubusercontent.com/51714798/231294720-1c64b391-4ecf-42d2-aad2-8c486c5d6bf5.png)
+Made using T3 Turbo x Supabase stack.
 
 ## About
 
-This is an extended version of [create-t3-turbo](https://github.com/t3-oss/create-t3-turbo) implementing authentication using [Supabase Auth](https://supabase.com/docs/guides/auth) on both the web and mobile applications.
+This is a project aimed at providing users a streamlined way of practicing speach against AI chatbots playing different characters, within different scenarios. Using OpenAI's api for our chatbots.
+
+## TO-DO
+
+Requires removal of brackets and keys being displayed during text stream phase - Only the reply text should be visibly 'streamed in' in the end product.
+
+Adjust Prompts to more accurately portray described characters. Currently chatbot cant be annoyed at the user in the slightest. Might look into Mistral-7b-instruct model deployment on huggingface to rectify the situation - if i cant get prompts to work as intended.
+
+Add additional auth methods.
+
+User Profiles, settings, and etc.
+
+Added Limitation of (x) messages before ending the conversation forcefully.
+
+End Review & scoring of conversation as a whole.
+
+Entire Expo app - Wont take long to make if there is interest in this project. Its just like 4 Screens
+
+## Pre-existing README Below.
 
 ### Side note for mobile
 

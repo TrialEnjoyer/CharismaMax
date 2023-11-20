@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Router from "next/router";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Eye, EyeOff, Github } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SigninPage() {
   const supabase = useSupabaseClient();

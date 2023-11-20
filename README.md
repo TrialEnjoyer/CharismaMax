@@ -2,6 +2,10 @@
 
 Made using T3 Turbo x Supabase stack.
 
+## Quick Note:
+
+I am stopping this project for now until OA's Crazyness subsited OR i get bored enough to look into implementing Mistral on huggingface. I have other stuff to work on for now so i will re-visit in the future.
+
 ## About
 
 This is a project aimed at providing users a streamlined way of practicing speach against AI chatbots playing different characters, within different scenarios. Using OpenAI's api for our chatbots.

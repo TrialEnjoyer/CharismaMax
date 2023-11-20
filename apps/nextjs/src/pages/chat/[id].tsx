@@ -176,7 +176,7 @@ const ConversationPage = () => {
       inputmessage += `(From the admin - DO NOT INCLUDE IN SCORING - Advance the conversation in a direction based on your the scenario)`;
     }
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4", //"gpt-3.5-turbo",
       messages: [
         {
           role: "system",
@@ -278,9 +278,9 @@ const ConversationPage = () => {
 
   return (
     <div className="mx-auto flex h-screen w-full flex-col justify-between overflow-hidden bg-zinc-900 p-4 text-zinc-200">
-      <div className="flex flex-row gap-5 p-5 pt-0">
+      <div className="flex flex-row gap-5 p-1 pt-0 md:p-5">
         <div
-          className=" rounded-md bg-emerald-400 p-1 text-center font-bold hover:cursor-pointer hover:bg-emerald-600"
+          className=" h-8 rounded-md bg-emerald-400 p-1 text-center font-bold hover:cursor-pointer hover:bg-emerald-600"
           onClick={handleHomeClick}
         >
           Home

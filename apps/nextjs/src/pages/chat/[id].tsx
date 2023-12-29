@@ -1,8 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Router, { useRouter } from "next/router";
+import MistralClient from "@mistralai/mistralai";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import OpenAI from "openai";
+
+//const apiKey = process.env.MISTRAL_API_KEY;
+
+//const client = new MistralClient(apiKey);
 
 import { env } from "~/env.mjs";
 import type { Conversation, message } from "~/types";
@@ -165,34 +170,43 @@ const ConversationPage = () => {
     setLoading(true);
     setShowRegenerate(false);
     setLoadingMessageId(input.id);
-    const openai = new OpenAI({
+    /*const openai = new OpenAI({
       apiKey: env.NEXT_PUBLIC_OPENAI_API_KEY,
       dangerouslyAllowBrowser: true,
-    });
-    const ResponseAddOnText = `Stay in character while replying. Response is to always be in valid JSON format following: {"reply": "[Your response to the message here]","score": [Your score out of 100],"review": "[Your review here]"}`;
+    });*/
+
+    const mistClient = new MistralClient(env.NEXT_PUBLIC_MISTRAL_API_KEY);
+
+    const ResponseAddOnText = `Stay in character while replying. If you do not know what to say, or if the input is too small to generate a decent response, then reply true to your character in that situation.`;
     const openAIFormattedMessages = transformMessagesToOpenAIFormat(messages);
     let inputmessage = input.text;
     if (first) {
       inputmessage += `(From the admin - DO NOT INCLUDE IN SCORING - Advance the conversation in a direction based on your the scenario)`;
     }
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4", //"gpt-3.5-turbo",
+
+    const completion = await mistClient.chatStream({
+      model: "mistral-tiny",
       messages: [
         {
           role: "system",
           content: ` You are a modern conversation partner, a ficticious modern character called ${conversation?.character_id}, your background is as follows: ${conversation?.character_text}. The current scenario is: ${conversation?.scenario_text}. Always reply in character as much possible keeping the whole conversation in mind. If the reply doesnt go somewhere, try to steer the conversation in a random direction in an attempt to keep it going. If after a few replies the conversation still doesnt go anywhere, feel free to end the conversation.
-            Rate the following messages from the user on a scale of 0 to 100 based on the following scoring difficulty: ${conversation?.difficulty_text},taking into consideration the character you play, the user's reply, and the scenario. Provide a short review on how the message could have been better, considering factors such as tone, clarity, and engagement. Then, craft an appropriate response to the message. Format your reply as a JSON object containing the score, review, and response.
-            Always stick to the Response format. Do not ask how you can assist the user nor mention anything about being an ai model or assistant. ${ResponseAddOnText}. Once again, the character you play does not offer assistance or uses standard greetings like 'How can I help you?' and if you do not know what to say, or if the input is too small to generate a decent response, then reply true to your character in that situation.`,
+            Rate the following messages from the user on a scale of 0 to 100 based on the following scoring difficulty: ${conversation?.difficulty_text},taking into consideration the character you play, the user's reply, and the scenario. Provide a short review on how the message could have been better, considering factors such as tone, clarity, and engagement. Then, craft an appropriate response to the message. Always stick to the Response format. Do not ask how you can assist the user nor mention anything about being an ai model or assistant. 
+            ${ResponseAddOnText}. Once again, the character you play does not offer assistance or use standard greetings like 'How can I help you?' and if you do not know what to say, or if the input is too small to generate a decent response, then reply true to your character in that situation.`,
         },
         ...openAIFormattedMessages,
         { role: "user", content: inputmessage + " --- " + ResponseAddOnText },
       ],
-      max_tokens: 150,
       stream: true,
     });
-
     let streamTxt = "";
-    for await (const message of completion) {
+    for await (const chunk of completion) {
+      if (chunk.choices[0].delta.content !== undefined) {
+        const streamText = chunk.choices[0].delta.content;
+        streamTxt += streamText;
+      }
+    }
+
+    /*for await (const message of completion) {
       if (
         message.choices &&
         message.choices.length > 0 &&
@@ -203,15 +217,15 @@ const ConversationPage = () => {
         streamTxt += content;
         setStream((prevStream) => prevStream + content);
       }
-    }
+    }*/
     //manipulate data to fit the format
     try {
-      const dataObj: { reply: string; score: number; review: string } =
+      /*const dataObj: { reply: string; score: number; review: string } =
         JSON.parse(streamTxt) as {
           reply: string;
           score: number;
           review: string;
-        };
+        };*/
 
       const toDatabase = {
         id: input.id,
@@ -221,9 +235,9 @@ const ConversationPage = () => {
         createdAt: input.createdAt,
         updatedAt: new Date(),
         history: input.history,
-        reply: dataObj.reply || undefined,
-        score: dataObj.score || undefined,
-        review: dataObj.review || undefined,
+        reply: streamTxt || undefined,
+        //score: dataObj.score || undefined,
+        //review: dataObj.review || undefined,
       };
       setStream("");
       setLoading(false);

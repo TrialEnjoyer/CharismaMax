@@ -3,7 +3,8 @@ import Image from "next/image";
 import Router, { useRouter } from "next/router";
 import MistralClient from "@mistralai/mistralai";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
-import OpenAI from "openai";
+
+//import OpenAI from "openai";
 
 //const apiKey = process.env.MISTRAL_API_KEY;
 
@@ -286,8 +287,10 @@ const ConversationPage = () => {
     }
   }, [messages]);
 
-  const handleHomeClick = async () => {
-    await Router.push("/");
+  const handleHomeClick = () => {
+    console.log("going home");
+    //await Router.push("/");
+    Router.push("/");
   };
 
   return (

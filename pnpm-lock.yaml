@@ -17,6 +17,9 @@ importers:
       '@manypkg/cli':
         specifier: ^0.20.0
         version: 0.20.0
+      '@mistralai/mistralai':
+        specifier: ^0.0.8
+        version: 0.0.8
       '@types/prettier':
         specifier: ^2.7.2
         version: 2.7.2
@@ -2318,6 +2321,14 @@ packages:
       globby: 11.1.0
       jju: 1.4.0
       read-yaml-file: 1.1.0
+    dev: false
+
+  /@mistralai/mistralai@0.0.8:
+    resolution: {integrity: sha512-0DIgJiYy4mWSUPnq2M0LpngBcnkllDfYg16/+z1yzy8qApceNXm+yXHoLn8go6Tg4hKtCO1WscnFHF09rSAufg==}
+    dependencies:
+      node-fetch: 2.6.7
+    transitivePeerDependencies:
+      - encoding
     dev: false
 
   /@next/env@13.3.0:
